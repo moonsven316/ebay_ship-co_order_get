@@ -1779,11 +1779,12 @@ def archived(driver, product_sheet_id, order_sheet_id):
             # ship&co end
 
             update_or_insert_data(states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, remarks, order_sheet_id)
+            driver.close()
     else:
         driver.close()
 
 if __name__ == '__main__':
-    specific_date = datetime(2024, 7, 13)
+    specific_date = datetime(2024, 8, 15)
     current_date = datetime.now()
     if specific_date < current_date:
         print('>>> expired <<<')
