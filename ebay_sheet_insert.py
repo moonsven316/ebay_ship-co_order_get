@@ -128,24 +128,17 @@ def update_or_insert_data(states, inspection, warehouse, person_charge, shipping
                 states = "一部返金"
             elif tracking_info == "Canceled":
                 states = "キャンセル"
+            elif tracking_info == "Awaiting payment":
+                states = "未確認"
+                inspection = "決済待機中"
+            elif "Ship by" in tracking_info:
+                states = "未確認"
+            else:
+                states = "発送済"
             create_sheet_w = int(item[24].split("月")[0])
             sheet_name = f"販売管理{create_sheet_w}月"
 
-            # columns_to_update = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-            # updated_row = [states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, remarks, tax_fee, total_fee]
-            # print(len(updated_row))
-            # print(max(columns_to_update))
-            # updated_row = [updated_row[i] for i in columns_to_update]
-            # range_name = f"{sheet_name}!A{values.index(item)+6}:{chr(ord('A') + max(columns_to_update))}{values.index(item)+6}"
-            
-            # result = (sheet.values().update(
-            #     spreadsheetId=order_sheet_id, 
-            #     range=range_name, 
-            #     valueInputOption="USER_ENTERED", 
-            #     body={"values": [updated_row]}
-            # ).execute())
-            # print("data update")
-            updated_row = [states, item[1], item[2], item[3], item[4], buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item[12], item[13], item[14], item[15], item[16], item[17], item[18], item[19], item[20], item[21], item[22], item[23], date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, item[33], item[34], refund_amount, return_fee, tracking_info, item[38], item[39], item[40]]
+            updated_row = [item[0], item[1], item[2], item[3], item[4], buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item[12], item[13], item[14], item[15], item[16], item[17], item[18], item[19], item[20], item[21], item[22], item[23], date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, item[33], item[34], item[35], item[36], tracking_info, remarks, tax_fee, total_fee]
             result = (sheet.values().update(
                 spreadsheetId=order_sheet_id, 
                 range=f"{sheet_name}!A{values.index(item)+6}:AO", 
@@ -161,6 +154,13 @@ def update_or_insert_data(states, inspection, warehouse, person_charge, shipping
                 states = "一部返金"
             elif tracking_info == "Canceled":
                 states = "キャンセル"
+            elif tracking_info == "Awaiting payment":
+                states = "未確認"
+                inspection = "決済待機中"
+            elif "Ship by" in tracking_info:
+                states = "未確認"
+            else:
+                states = "発送済"
             
             insert_data(states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, remarks, order_sheet_id)
 
