@@ -6,7 +6,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-# SAMPLE_SPREADSHEET_ID = "1wuq9MBXS1iWcwTSUWRSn4mRMApUB23h_jZ0VkoHB680"
 
 def get_credentials():
     creds = None
@@ -60,7 +59,7 @@ def search_sku(buyer_name, sku, values):
 def insert_data(states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, remarks, order_sheet_id):
     create_sheet_w = int(date_sold.split("月")[0])
     sheet_name = f"販売管理{create_sheet_w}月"
-    range_name = f"{sheet_name}!A6:AO"
+    range_name = f"{sheet_name}!A6:AP"
     
     creds = get_credentials()
     try:
@@ -73,13 +72,14 @@ def insert_data(states, inspection, warehouse, person_charge, shipping_notes, bu
         )
         values = result.get("values", [])
         last_row = len(values) + 6
-        profit = f"=AM{last_row}*($F$2-($F$2*AG{last_row}))-P{last_row}-N{last_row}-AJ{last_row}*$F$2-AK{last_row}"
+        profit = f"=AN{last_row}*($F$2-($F$2*AG{last_row}))-P{last_row}-N{last_row}-AJ{last_row}*$F$2-AK{last_row}"
         profit_including_refund = f"=AH{last_row}+P{last_row}*0.1+(AE{last_row}*Z{last_row}*($F$2-($F$2*AG{last_row}))*0.1)"
-        remarks = f"=Z{last_row}+AC{last_row}-AN{last_row}"
-        tax_fee = f"=AO{last_row}*1.1"
+        remarks = f"=Z{last_row}+AC{last_row}-AO{last_row}"
+        tax_fee = f"=AP{last_row}*1.1"
         total_fee = f"=((Z{last_row}+AA{last_row}+AC{last_row})*AE{last_row} + 0.4 + (Z{last_row}+AA{last_row}+AC{last_row})*AF{last_row} + (Z{last_row}+AA{last_row}+AC{last_row})*AD{last_row} + ((Z{last_row}+AA{last_row}+AC{last_row})*AD{last_row}*0.1))"
+        note = ""
 
-        values = [[states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, remarks, tax_fee, total_fee]]
+        values = [[states, inspection, warehouse, person_charge, shipping_notes, buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item_name, shipping_cost, purchase_date, purchase_price, supplier, supplier_url, supplier_url2, tracking_number, invoice_category, supplier_name, supplier_address, eligible_registration_number, date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, profit, profit_including_refund, refund_amount, return_fee, tracking_info, note, remarks, tax_fee, total_fee]]
         body = {"values": values}
         result = (sheet.values().append(
             spreadsheetId=order_sheet_id, 
@@ -116,10 +116,10 @@ def update_or_insert_data(states, inspection, warehouse, person_charge, shipping
         if item:
             print(item)
             print("Ok matching data")
-            profit = f"=AM{values.index(item)+6}*($F$2-($F$2*AG{values.index(item)+6}))-P{values.index(item)+6}-N{values.index(item)+6}-AJ{values.index(item)+6}*$F$2-AK{values.index(item)+6}"
+            profit = f"=AN{values.index(item)+6}*($F$2-($F$2*AG{values.index(item)+6}))-P{values.index(item)+6}-N{values.index(item)+6}-AJ{values.index(item)+6}*$F$2-AK{values.index(item)+6}"
             profit_including_refund = f"=AH{values.index(item)+6}+P{values.index(item)+6}*0.1+(AE{values.index(item)+6}*Z{values.index(item)+6}*($F$2-($F$2*AG{values.index(item)+6}))*0.1)"
-            remarks = f"=Z{values.index(item)+6}+AC{values.index(item)+6}-AN{values.index(item)+6}"
-            tax_fee = f"=AO{values.index(item)+6}*1.1"
+            remarks = f"=Z{values.index(item)+6}+AC{values.index(item)+6}-AO{values.index(item)+6}"
+            tax_fee = f"=AP{values.index(item)+6}*1.1"
             total_fee = f"=((Z{values.index(item)+6}+AA{values.index(item)+6}+AC{values.index(item)+6})*AE{values.index(item)+6} + 0.4 + (Z{values.index(item)+6}+AA{values.index(item)+6}+AC{values.index(item)+6})*AF{values.index(item)+6} + (Z{values.index(item)+6}+AA{values.index(item)+6}+AC{values.index(item)+6})*AD{values.index(item)+6} + ((Z{values.index(item)+6}+AA{values.index(item)+6}+AC{values.index(item)+6})*AD{values.index(item)+6}*0.1))"
 
             if tracking_info == "Refunded":
@@ -138,10 +138,10 @@ def update_or_insert_data(states, inspection, warehouse, person_charge, shipping
             create_sheet_w = int(item[24].split("月")[0])
             sheet_name = f"販売管理{create_sheet_w}月"
 
-            updated_row = [item[0], item[1], item[2], item[3], item[4], buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item[12], item[13], item[14], item[15], item[16], item[17], item[18], item[19], item[20], item[21], item[22], item[23], date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, item[33], item[34], item[35], item[36], tracking_info, remarks, tax_fee, total_fee]
+            updated_row = [item[0], item[1], item[2], item[3], item[4], buyer_name, shipping_method, tracking_no, sku, order_number, product_name, ebay_product_name, item[12], item[13], item[14], item[15], item[16], item[17], item[18], item[19], item[20], item[21], item[22], item[23], date_sold, sale_price, sales_tax, quantity, shipping, pl, sold_fee, overseas_fee, pn, item[33], item[34], item[35], item[36], tracking_info, item[38], remarks, tax_fee, total_fee]
             result = (sheet.values().update(
                 spreadsheetId=order_sheet_id, 
-                range=f"{sheet_name}!A{values.index(item)+6}:AO", 
+                range=f"{sheet_name}!A{values.index(item)+6}:AP", 
                 valueInputOption="USER_ENTERED", 
                 body={"values": [updated_row]}
             ).execute())

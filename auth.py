@@ -12,23 +12,30 @@ def auth_data_save():
     ship_pass = ship_pass_entry.get()
     product_sheet_id = product_manager_sheet_entry.get()
     order_sheet_id = order_manager_sheet_entry.get()
+    total_data = total_check_box.get()
+    recent_data = recent_check_box.get()
+    checkbox_val = ""
     if ebay_id == '':
         messagebox.showwarning("警告", "ebayユーザーIDは必須です。")
         return
     if ebay_pass == '':
         messagebox.showwarning("警告", "ebayユーザーPASSは必須です。")
         return
-    # if ship_id == '':
-    #     messagebox.showwarning("警告", "ship&coユーザーIDは必須です。")
-    #     return
-    # if ship_pass == '':
-    #     messagebox.showwarning("警告", "ship&coユーザーPASSは必須です。")
-    #     return
     if product_sheet_id == '':
         messagebox.showwarning("警告", "商品管理シートIDは必須です。")
         return
     if order_sheet_id == '':
         messagebox.showwarning("警告", "注文管理シートIDは必須です。")
+        return
+    if total_data == True:
+        checkbox_val = 0
+    if recent_data == True:
+        checkbox_val = 1
+    if total_data == False and recent_data == False:
+        messagebox.showwarning("警告", "データ取得期間は必須です。")
+        return
+    if total_data == True and recent_data == True:
+        messagebox.showwarning("警告", "1つの項目だけを選択してください。")
         return
     data = {
         "ebay_id": ebay_id,
@@ -36,7 +43,9 @@ def auth_data_save():
         "ship_id": ship_id,
         "ship_pass": ship_pass,
         "product_sheet_id": product_sheet_id,
-        "order_sheet_id": order_sheet_id
+        "order_sheet_id": order_sheet_id,
+        "total_data": total_data,
+        "recent_data": recent_data
     }
 
     # Save the data to a JSON file
@@ -59,35 +68,41 @@ def submit_login():
     ship_pass = ship_pass_entry.get()
     product_sheet_id = product_manager_sheet_entry.get()
     order_sheet_id = order_manager_sheet_entry.get()
+    total_data = total_check_box.get()
+    recent_data = recent_check_box.get()
+    checkbox_val = ""
     if ebay_id == '':
         messagebox.showwarning("警告", "ebayユーザーIDは必須です。")
         return
     if ebay_pass == '':
         messagebox.showwarning("警告", "ebayユーザーPASSは必須です。")
         return
-    # if ship_id == '':
-    #     messagebox.showwarning("警告", "ship&coユーザーIDは必須です。")
-    #     return
-    # if ship_pass == '':
-    #     messagebox.showwarning("警告", "ship&coユーザーPASSは必須です。")
-    #     return
     if product_sheet_id == '':
         messagebox.showwarning("警告", "商品管理シートIDは必須です。")
         return
     if order_sheet_id == '':
         messagebox.showwarning("警告", "注文管理シートIDは必須です。")
         return
+    if total_data == True:
+        checkbox_val = 0
+    if recent_data == True:
+        checkbox_val = 1
+    if total_data == False and recent_data == False:
+        messagebox.showwarning("警告", "データ取得期間は必須です。")
+        return
+    if total_data == True and recent_data == True:
+        messagebox.showwarning("警告", "1つの項目だけを選択してください。")
+        return
+
     if not(ship_id == '' or ship_pass == ''):
-        windows(ebay_id, ebay_pass, ship_id, ship_pass, product_sheet_id, order_sheet_id)
+        windows(ebay_id, ebay_pass, ship_id, ship_pass, product_sheet_id, order_sheet_id, checkbox_val)
     else:
-        get_ebay_data(ebay_id, ebay_pass, product_sheet_id, order_sheet_id)
-
-
+        get_ebay_data(ebay_id, ebay_pass, product_sheet_id, order_sheet_id, checkbox_val)
 
 # Create the main window
 login_window = tk.Tk()
 login_window.title("販売管理シートツール")
-login_window.geometry('300x380')
+login_window.geometry('300x400')
 # ebayTitle
 ebay_title = tk.Label(login_window, text="ebayアカウント")
 ebay_title.pack()
@@ -138,6 +153,14 @@ order_manager_sheet_label.place(x=20, y=280)
 order_manager_sheet_entry = tk.Entry(login_window)
 order_manager_sheet_entry.pack()
 order_manager_sheet_entry.place(x=20, y=300, width=260)
+# total
+total_check_box = tk.BooleanVar()
+total_checkbox = tk.Checkbutton(login_window, text="すべてのデータを取得", variable=total_check_box)
+total_checkbox.place(x=16, y=330)
+# recent
+recent_check_box = tk.BooleanVar()
+recent_checkbox = tk.Checkbutton(login_window, text="最近月データを取得", variable=recent_check_box)
+recent_checkbox.place(x=160, y=330)
 def insert_values():
     auth_data = read_auth_data()
     if auth_data is not None:
@@ -147,13 +170,14 @@ def insert_values():
         ship_pass_entry.insert(0, auth_data["ship_pass"])
         product_manager_sheet_entry.insert(0, auth_data["product_sheet_id"])
         order_manager_sheet_entry.insert(0, auth_data["order_sheet_id"])
+        total_check_box.set(auth_data["total_data"])
+        recent_check_box.set(auth_data["recent_data"])
 insert_values()
 # Submit button
 save_button = tk.Button(login_window, text="保存", command=auth_data_save)
 save_button.pack()
-save_button.place(x=200, y=330)
+save_button.place(x=200, y=360)
 submit_button = tk.Button(login_window, text="起動", command=submit_login)
 submit_button.pack()
-submit_button.place(x=245, y=330)
-
+submit_button.place(x=245, y=360)
 login_window.mainloop()
